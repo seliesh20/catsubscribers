@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Subscribers List{% endblock %}
+{% block stylesheets %}
+    <link href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script>
+    (function($){        
+        var table = $("#subscriber-table").DataTable({
+            "processing": true,
+            "serverSide": true,    
+            "columns"   : [
+                {data:"name"},
+                {data:"email"},
+                {data:"categories", render: function (data, type, row, meta){                    
+                    return row.categories.map(function(data){
+                        return data.name
+                    }).join(', ')
+                }, "orderable": false},
+                {data:"post_time"},
+                {data:"actions", "orderable": false}
+            ],          
+            "ajax": {
+                url:"{{app.request.getSchemeAndHttpHost()}}{{'/list/subscribers'}}",
+                type:"POST",
+                dataType:"JSON"                
+            },
+            "order":[[0, "asc"]]
+        });
+
+        $(document).on("click", ".subscriber-delete", function(e){
+            e.preventDefault();
+            var th = $(this);
+            if(confirm("Are you sure to delete this subscriber?")){
+                $.ajax({
+                    url:"{{app.request.getSchemeAndHttpHost()}}{{'/list/deleteSubscriber'}}",
+                    data:{id:th.data("id")},
+                    dataType:"JSON",
+                    type:"POST",
+                    success:function(result){
+                        if(result.status == "success"){
+                            table.ajax.reload();
+                        }
+                    }   
+                })
+            }
+        });
+
+        $(document).on("click", ".subscriber-edit", function(e){
+            var id = $(this).data("id");
+            $.ajax({
+                url:"{{app.request.getSchemeAndHttpHost()}}{{'/list/getSubscriber'}}",
+                data:{id:id},
+                dataType:"JSON",
+                type:"POST",
+                success:function(result){
+                    if(result.status == "success"){
+                        var modalWindow = $("#staticBackdrop");            
+                        $("input[name=name]", modalWindow).val(result.data.name);
+                        $("input[name=email]", modalWindow).val(result.data.email);
+                        $("input[name=id]", modalWindow).val(result.data.id);
+                        modalWindow.modal("show");
+                    }
+                }
+            })
+        });
+
+        $("#edit_subscriber").submit(function(e){
+            e.preventDefault();
+            var data = {
+                name:$("input[name=name]", this).val(),
+                email:$("input[name=email]", this).val(),
+                id:$("input[name=id]", this).val()
+            }
+            $.ajax({
+                url:"{{app.request.getSchemeAndHttpHost()}}{{'/list/updateSubscriber'}}",
+                data:data,
+                dataType:"JSON",
+                type:"POST",
+                success:function(result){
+                    if(result.status == "success"){
+                        var modalWindow = $("#staticBackdrop"); 
+                        modalWindow.modal("hide");
+                        table.ajax.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            })
+
+        })
+
+    })(jQuery);
+    </script>
+{% endblock %}
+
+{% block body %}
+    <table class="table" id="subscriber-table">
+        <thead>
+            <tr>
+                <th class="col-md-3">Name</th>
+                <th class="col-md-3">Email</th>
+                <th class="col-md-2">Categories</th>
+                <th class="col-md-2">Post Time</th>
+                <th class="col-md-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <form id="edit_subscriber" method="post" action="#">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Edit Subscriber</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" class="form-control" required/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" required/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="id">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
