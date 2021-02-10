@@ -112,13 +112,17 @@ class ListController extends AbstractController
             $subscriber['name'] = $request->request->get('name');
             $subscriber['email'] = $request->request->get('email');
 
-            $email_check = (array) $subscriber_object->getSubscribers(["email"=>$request->request->get('email')]);
-            if(is_array($email_check) && $email_check["id"] <> $id){
-                return $this->json(["status"=>"failure", "message"=>"Email Already exists"]);
-            } else {
-                $subscriber_object->updateSubscriber($subscriber, $id);
-                return $this->json(["status"=>"success"]);
+            $subscribers_list = (array) $subscriber_object->getSubscribers(["email"=>$request->request->get('email')]);
+            if(is_array($subscribers_list) && count($subscribers_list)){
+                foreach($subscribers_list as $subscriber_row){
+                    if(is_array($subscriber_row) && $email_check->id <> $id){
+                        return $this->json(["status"=>"failure", "message"=>"Email Already exists"]);
+                    }
+                }  
             }
+            //update
+            $subscriber_object->updateSubscriber($subscriber, $id);
+            return $this->json(["status"=>"success"]);            
         } else {
             //return new Response($this->json(["status"=>"failure", "message"=>"Invalid Request"]), 200,  ["application/json"]);
             return $this->json(["status"=>"failure", "message"=>"Invalid Request"]);
