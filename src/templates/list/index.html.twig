@@ -24,7 +24,7 @@
                 {data:"actions", "orderable": false}
             ],          
             "ajax": {
-                url:"{{app.request.getSchemeAndHttpHost()}}{{'/list/subscribers'}}",
+                url:"{{path('list_subscribers')}}",
                 type:"POST",
                 dataType:"JSON"                
             },
@@ -36,7 +36,7 @@
             var th = $(this);
             if(confirm("Are you sure to delete this subscriber?")){
                 $.ajax({
-                    url:"{{app.request.getSchemeAndHttpHost()}}{{'/list/deleteSubscriber'}}",
+                    url:"{{path('delete_subscriber')}}",
                     data:{id:th.data("id")},
                     dataType:"JSON",
                     type:"POST",
@@ -52,7 +52,7 @@
         $(document).on("click", ".subscriber-edit", function(e){
             var id = $(this).data("id");
             $.ajax({
-                url:"{{app.request.getSchemeAndHttpHost()}}{{'/list/getSubscriber'}}",
+                url:"{{path('get_subscriber')}}",
                 data:{id:id},
                 dataType:"JSON",
                 type:"POST",
@@ -76,7 +76,7 @@
                 id:$("input[name=id]", this).val()
             }
             $.ajax({
-                url:"{{app.request.getSchemeAndHttpHost()}}{{'/list/updateSubscriber'}}",
+                url:"{{path('update_subscriber')}}",
                 data:data,
                 dataType:"JSON",
                 type:"POST",
