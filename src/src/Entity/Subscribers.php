@@ -30,7 +30,7 @@ class Subscribers
         $subscriber["id"] = md5(strtotime(date("Y-m-d H:i:s")).rand());
         $subscriber["post_time"] = date("Y-m-d H:i:s");
         $subscribers[] = $subscriber;        
-        file_put_contents('../data/subscribers.json', json_encode($subscribers));        
+        file_put_contents(\dirname(__DIR__).'/../data/subscribers.json', json_encode($subscribers));        
     }
     /**
      * 
@@ -43,7 +43,7 @@ class Subscribers
                 $subscribers = array_splice($subscribers, $key, 1);
             }
         }
-        file_put_contents('../data/subscribers.json', json_encode($subscribers));        
+        file_put_contents(\dirname(__DIR__).'/../data/subscribers.json', json_encode($subscribers));        
     }
 
     /**
@@ -58,16 +58,16 @@ class Subscribers
                 $subscribers[$key]->email = $subscriber["email"];
             }
         }        
-        file_put_contents('../data/subscribers.json', json_encode($subscribers));        
+        file_put_contents(\dirname(__DIR__).'/../data/subscribers.json', json_encode($subscribers));        
     }
 
     /**
      * 
      */
     public function getSubscribers($like = [], $sort = [], $limit = []):array
-    {
-        if(file_exists('../data/subscribers.json')){
-            $subscribers = json_decode(file_get_contents('../data/subscribers.json'));
+    {        
+        if(file_exists(\dirname(__DIR__).'/../data/subscribers.json')){
+            $subscribers = json_decode(file_get_contents(\dirname(__DIR__).'/../data/subscribers.json'));            
             foreach($subscribers as $k=>$subscriber){
                 //like                             
                 if(is_array($like) && count($like)){                      
