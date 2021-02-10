@@ -1,7 +1,7 @@
 # Category Subscribers
 Development Enviroment with the Docker
 # Docker
-Docker user PHP-FPM and NGINX. Docker files are available in docker folder.
+Docker uses PHP-FPM and NGINX. Docker files are available in docker folder.
 
 `docker> docker-compose up`
 
